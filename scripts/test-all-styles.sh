@@ -11,7 +11,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-SKILL_DIR="/Users/bradzhang/.claude/skills/fireworks-tech-graph"
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TEST_DIR="${SKILL_DIR}/test-output"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 

@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Test outputs
+test-output/
+*.png
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# Temporary/broken files
+*.tmp
+*.temp
+temlass.svg
+agentloture.svg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (if any)
+node_modules/
+package.json
+package-lock.json

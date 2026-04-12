@@ -107,7 +107,7 @@ echo -e "${BLUE}Generating ${TYPE} diagram (style ${STYLE})...${NC}"
 echo "Output: $SVG_FILE"
 
 # Load style reference
-SKILL_DIR="/Users/bradzhang/.claude/skills/fireworks-tech-graph"
+SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STYLE_FILE="${SKILL_DIR}/references/style-${STYLE}.md"
 
 if [ ! -f "$STYLE_FILE" ]; then
