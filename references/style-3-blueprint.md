@@ -39,7 +39,7 @@ Accent colors:
 ## Typography
 
 ```
-font-family: 'Courier New', 'Lucida Console', monospace
+font-family: 'Courier New', 'Lucida Console', 'Microsoft YaHei', 'SimHei', monospace
 font-size:   13px labels, 10px annotations, 16px title
 font-weight: 400; titles use 700
 text-transform: uppercase for section headers
@@ -98,7 +98,7 @@ letter-spacing: 0.05em
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600"
      width="960" height="600">
   <style>
-    text { font-family: 'Courier New', monospace; fill: #caf0f8; }
+    text { font-family: 'Courier New', 'Lucida Console', 'Microsoft YaHei', 'SimHei', monospace; fill: #caf0f8; }
   </style>
   <defs>
     <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">

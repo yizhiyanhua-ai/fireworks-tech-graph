@@ -26,8 +26,8 @@ Arrow color:     #5a5a5a  (consistent dark gray)
 `ypography
 
 ```
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 
-             Arial, sans-serif
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+             Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif
 font-size:   16px node labels, 14px descriptions, 13px arrow labels
 font-weight: 600 for node labels, 400 for descriptions, 700 for titles
 ```
@@ -158,8 +158,8 @@ Position: bottom-right, 20px margin from edges.
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" 
      width="960" height="600">
   <style>
-    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 
-                   'Helvetica Neue', Arial, sans-serif; 
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                   'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif;
     }
   </style>
   <defs>

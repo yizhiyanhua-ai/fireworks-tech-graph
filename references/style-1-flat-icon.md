@@ -30,8 +30,8 @@ Icon accent backgrounds:
 ## Typography
 
 ```
-font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 
-             'Microsoft YaHei', sans-serif
+font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC',
+             'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif
 font-size:   14px labels, 12px sub-labels, 16px titles
 font-weight: 400 normal, 600 semi-bold for titles
 ```
@@ -92,7 +92,7 @@ Always include a legend in the bottom-left if multiple arrow colors are used:
      width="960" height="600">
   <style>
     /* NO @import — rsvg-convert cannot fetch external URLs */
-    text { font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
   </style>
   <defs>
     <!-- arrow markers here -->
