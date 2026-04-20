@@ -31,8 +31,9 @@ Accent (subtle, used sparingly):
 ## Typography
 
 ```
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 
-             'Helvetica Neue', Arial, sans-serif
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+             'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei',
+             'Microsoft JhengHei', 'SimHei', sans-serif
 font-size:   14px labels, 11px uppercase type labels, 18px title
 font-weight: 400 normal, 500 medium for node labels
 ```
@@ -75,7 +76,7 @@ font-weight: 400 normal, 500 medium for node labels
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560"
      width="960" height="560">
   <style>
-    text { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; }
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif; }
   </style>
   <defs>
     <!-- arrow markers (blue only) -->

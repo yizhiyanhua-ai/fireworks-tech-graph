@@ -69,7 +69,7 @@ MARKER_IDS = {
 STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     1: {
         "name": "Flat Icon",
-        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#ffffff",
         "shadow": True,
         "title_align": "center",
@@ -110,7 +110,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     2: {
         "name": "Dark Terminal",
-        "font_family": "'SF Mono', 'Fira Code', Menlo, monospace",
+        "font_family": "'SF Mono', 'Fira Code', Menlo, 'Microsoft YaHei', 'SimHei', monospace",
         "background": "#0f172a",
         "shadow": False,
         "title_align": "center",
@@ -151,7 +151,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     3: {
         "name": "Blueprint",
-        "font_family": "'SF Mono', 'Fira Code', Menlo, monospace",
+        "font_family": "'SF Mono', 'Fira Code', Menlo, 'Microsoft YaHei', 'SimHei', monospace",
         "background": "#082f49",
         "shadow": False,
         "title_align": "center",
@@ -192,7 +192,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     4: {
         "name": "Notion Clean",
-        "font_family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+        "font_family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#ffffff",
         "shadow": False,
         "title_align": "left",
@@ -233,7 +233,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     5: {
         "name": "Glassmorphism",
-        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#0f172a",
         "shadow": True,
         "title_align": "center",
@@ -274,7 +274,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     6: {
         "name": "Claude Official",
-        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#f8f6f3",
         "shadow": False,
         "title_align": "left",
@@ -315,7 +315,7 @@ STYLE_PROFILES: Dict[int, Dict[str, object]] = {
     },
     7: {
         "name": "OpenAI",
-        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif",
+        "font_family": "'Helvetica Neue', Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', 'Microsoft JhengHei', 'SimHei', sans-serif",
         "background": "#ffffff",
         "shadow": False,
         "title_align": "left",
