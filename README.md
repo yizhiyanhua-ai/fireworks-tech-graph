@@ -32,9 +32,9 @@ This project is also a proof surface for a broader capability: turning vague AI/
 
 If you are building agent infrastructure, AI IDEs, internal copilots, developer tools, technical documentation systems, or applied AI workflow products, I am open to scoped paid sprints, design-partner work, and founding engineer conversations.
 
-- Founder-facing profile: https://personal-brand-site-orpin.vercel.app/en
-- Commercial case study: https://personal-brand-site-orpin.vercel.app/en/case-studies/fireworks-tech-graph
-- Work with me: https://personal-brand-site-orpin.vercel.app/en/work-with-me
+- Founder-facing profile: https://bradzhang.dev/en
+- Commercial case study: https://bradzhang.dev/en/case-studies/fireworks-tech-graph
+- Work with me: https://bradzhang.dev/en/work-with-me
 
 ---
 
