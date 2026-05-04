@@ -26,6 +26,18 @@ User: "Generate a Mem0 memory architecture diagram, dark style"
 
 ---
 
+## Work With the Builder
+
+This project is also a proof surface for a broader capability: turning vague AI/devtool workflows into constrained, reusable systems with validation, documentation, export paths, and product-facing polish.
+
+If you are building agent infrastructure, AI IDEs, internal copilots, developer tools, technical documentation systems, or applied AI workflow products, I am open to scoped paid sprints, design-partner work, and founding engineer conversations.
+
+- Founder-facing profile: https://personal-brand-site-orpin.vercel.app/en
+- Commercial case study: https://personal-brand-site-orpin.vercel.app/en/case-studies/fireworks-tech-graph
+- Work with me: https://personal-brand-site-orpin.vercel.app/en/work-with-me
+
+---
+
 ## Showcase
 
 > All samples exported at 1920px width (2× retina) via `rsvg-convert`. PNG is lossless and the right choice for technical diagrams — sharp edges, no JPEG compression artifacts on text/lines.
