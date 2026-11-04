@@ -63,6 +63,11 @@ heuristic text widths do not replace inspecting the actual rendered font.
 Use [visual quality guidance](references/visual-quality.md) for readability and
 style-specific refinements. Keep one semantic connector per business edge.
 
+If `render` fails before producing an SVG, inspect its JSON `diagnostic` and the
+failure report written by `--report`. Routing diagnostics name the edge, endpoints,
+ports and candidate blockers, including container headers. See
+[layout diagnostics](references/diagram-layout-reference.md#routing-failure-diagnostics).
+
 ## Additional outputs
 
 - **PNG:** prefer `export-png`, which reads root canvas dimensions, limits output

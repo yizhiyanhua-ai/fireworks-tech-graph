@@ -35,6 +35,7 @@ from diagram_ir import normalize_diagram  # noqa: E402
 from semantic_contracts import STYLE_NAMES, resolve_style_index  # noqa: E402
 from svg_canvas import parse_viewbox  # noqa: E402
 from style_quality import READABILITY_TOKENS, palette_report, text_quality_report  # noqa: E402
+from render_diagnostics import RenderError  # noqa: E402
 
 Point = Tuple[float, float]
 Bounds = Tuple[float, float, float, float]
@@ -1477,8 +1478,13 @@ def build_orthogonal_route(
             if not isinstance(raw_point, (list, tuple)) or len(raw_point) != 2:
                 raise ValueError(f"route waypoint {index + 1} must be [x, y]")
             waypoint = (to_float(raw_point[0]), to_float(raw_point[1]))
-            if any(geometry.point_in_bounds(waypoint, bounds, interior=True) for bounds in obstacles):
-                raise ValueError(f"route waypoint {index + 1} intersects an obstacle: {waypoint}")
+            hits = [i for i, bounds in enumerate(obstacles) if geometry.point_in_bounds(waypoint, bounds, interior=True)]
+            if hits:
+                raise RenderError(
+                    f"route waypoint {index + 1} intersects an obstacle: {waypoint}",
+                    {"code": "WAYPOINT_OBSTACLE", "waypoint_index": index + 1, "waypoint": list(waypoint),
+                     "blocking_obstacles": [{"index": i, "bounds": list(obstacles[i])} for i in hits]},
+                )
             if canvas_bounds is not None and not geometry.point_in_bounds(waypoint, canvas_bounds):
                 raise ValueError(f"route waypoint {index + 1} is outside the canvas: {waypoint}")
             waypoints.append(waypoint)
@@ -1602,7 +1608,36 @@ def build_orthogonal_route(
 
     if best_route is not None:
         return best_route
-    raise ValueError("no collision-free orthogonal route satisfies the current constraints")
+    # Collect diagnostic details only after the normal search has failed.
+    rejected = {"non_orthogonal": 0, "outside_canvas": 0, "obstacle_collision": 0}
+    blockers: Dict[int, int] = {}
+    for candidate in candidates:
+        simplified = simplify_points(candidate)
+        if not route_is_orthogonal(simplified):
+            rejected["non_orthogonal"] += 1
+            continue
+        if canvas_bounds is not None and not geometry.route_inside_canvas(simplified, canvas_bounds):
+            rejected["outside_canvas"] += 1
+            continue
+        hits = [index for index, bounds in enumerate(expanded) if route_collides(simplified, [bounds])]
+        if hits:
+            rejected["obstacle_collision"] += 1
+            for index in hits:
+                blockers[index] = blockers.get(index, 0) + 1
+    raise RenderError(
+        "no collision-free orthogonal route satisfies the current constraints",
+        {
+            "code": "ROUTE_NOT_FOUND", "search_start": list(start), "search_end": list(end),
+            "candidate_count": len(candidates), "rejected_candidates": rejected,
+            "blocking_obstacles": [
+                {"index": index, "bounds": list(obstacles[index]),
+                 "clearance_bounds": list(expanded[index]), "candidate_hits": hits}
+                for index, hits in sorted(blockers.items())
+            ],
+            "hint": "No route was found by this search; this is not proof that no route exists. "
+                    "Inspect the named obstacles, ports, padding and canvas, or move nodes to open a corridor.",
+        },
+    )
 
 
 def choose_label_position(points: Sequence[Point]) -> Point:
@@ -2765,6 +2800,7 @@ def render_arrow(
     *,
     existing_routes: Sequence[Sequence[Point]],
     canvas_bounds: Bounds,
+    obstacle_details: Sequence[Dict[str, object]] = (),
 ) -> ArrowRender:
     edge_id = str(arrow.get("_edge_id") or "edge")
     edge_dom_id = str(arrow.get("_edge_dom_id") or safe_identifier(edge_id, "edge"))
@@ -2807,14 +2843,31 @@ def render_arrow(
         routing_data["source_port"] = source_port
     if target_port:
         routing_data["target_port"] = target_port
-    route = build_orthogonal_route(
-        start,
-        end,
-        obstacles,
-        routing_data,
-        canvas_bounds=canvas_bounds,
-        existing_routes=existing_routes,
-    )
+    try:
+        route = build_orthogonal_route(
+            start, end, obstacles, routing_data,
+            canvas_bounds=canvas_bounds, existing_routes=existing_routes,
+        )
+    except ValueError as error:
+        diagnostic = dict(error.diagnostic) if isinstance(error, RenderError) else {"code": "ROUTE_INVALID"}
+        for blocker in diagnostic.get("blocking_obstacles", []):
+            obstacle_index = blocker["index"]
+            if obstacle_index < len(obstacle_details):
+                blocker.update(obstacle_details[obstacle_index])
+        diagnostic.update({
+            "edge_id": edge_id, "source": arrow.get("source"), "target": arrow.get("target"),
+            "source_port": source_port, "target_port": target_port,
+            "start": list(start), "end": list(end), "canvas_bounds": list(canvas_bounds),
+            "routing_padding": to_float(arrow.get("routing_padding", 24)),
+        })
+        named = ", ".join(
+            f'{item.get("kind", "obstacle")}:{item.get("owner", item["index"])}'
+            for item in diagnostic.get("blocking_obstacles", [])
+        )
+        message = f'{diagnostic["code"]}: edge={edge_id} source={arrow.get("source")} target={arrow.get("target")}: {error}'
+        if named:
+            message += f"; candidate blockers: {named}"
+        raise RenderError(message, diagnostic) from error
     interactions = geometry.route_interactions(route, existing_routes)
     if interactions.overlap_count:
         raise ValueError(f"edge {edge_id} has an unresolved collinear overlap")
@@ -3107,7 +3160,14 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
             f"node-{safe_identifier(node.node_id, 'node')}", used_dom_ids
         )
 
-    section_obstacles = [bounds for container in containers if (bounds := container_header_bounds(container, style)) is not None]
+    header_details = [
+        {"kind": "container_header", "owner": str(container.get("id") or f"container-{index:03d}"),
+         "label": str(container.get("label", "")), "header_text": section_header_text(container, style),
+         "bounds": list(bounds)}
+        for index, container in enumerate(containers)
+        if (bounds := container_header_bounds(container, style)) is not None
+    ]
+    section_obstacles = [tuple(item["bounds"]) for item in header_details]
     footer_reserved = footer_layout(source_data, width, height)
     blueprint_block_svg, blueprint_block_bounds = render_blueprint_title_block(source_data, style, style_index, width, height)
     node_obstacles = [node.bounds for node in normalized_nodes]
@@ -3137,6 +3197,13 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
 
     route_obstacles = node_obstacles + reserved_bounds
     label_obstacles = node_obstacles + reserved_bounds
+    obstacle_details = [{"kind": "node", "owner": node.node_id} for node in normalized_nodes] + header_details
+    if legend_reserved:
+        obstacle_details.append({"kind": "legend", "owner": "legend"})
+    if footer_reserved:
+        obstacle_details.append({"kind": "footer", "owner": "footer"})
+    if blueprint_block_bounds:
+        obstacle_details.append({"kind": "title_block", "owner": "blueprint-title-block"})
     prepared_arrows = prepare_arrows(arrows_data, node_map)
     rendered_by_index: Dict[int, ArrowRender] = {}
     existing_routes: List[Sequence[Point]] = []
@@ -3154,12 +3221,14 @@ def build_svg_with_report(template_type: str, data: Dict[str, object]) -> Tuple[
             label_obstacles,
             existing_routes=existing_routes,
             canvas_bounds=(0.0, 0.0, width, height),
+            obstacle_details=obstacle_details,
         )
         rendered_by_index[index] = rendered
         existing_routes.append(rendered.route)
         if rendered.label_bounds:
             label_obstacles.append(rendered.label_bounds)
             route_obstacles.append(rendered.label_bounds)
+            obstacle_details.append({"kind": "edge_label", "owner": rendered.edge_id})
         if rendered.report["bridges"]:
             issues.append(
                 {
@@ -3401,6 +3470,8 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
                 "ok": False,
                 "issues": [{"severity": "error", "code": "LAYOUT_ERROR", "message": str(exc)}],
             }
+            if isinstance(exc, RenderError):
+                failure_report["diagnostic"] = exc.diagnostic
             with open(args.layout_report, "w", encoding="utf-8") as handle:
                 json.dump(failure_report, handle, ensure_ascii=False, indent=2, sort_keys=True)
                 handle.write("\n")

@@ -25,6 +25,7 @@ from motion import DEFAULT_MOTION_DURATION, MOTION_PRESETS, probe_motion_runtime
 from validate_svg import run_check  # noqa: E402
 from png_export import export_png  # noqa: E402
 from semantic_contracts import STYLE_NAMES  # noqa: E402
+from render_diagnostics import RenderError  # noqa: E402
 
 
 def _load_generator():
@@ -105,9 +106,20 @@ def command_validate(args: argparse.Namespace) -> int:
 
 
 def command_render(args: argparse.Namespace) -> int:
+    if args.report and args.report.resolve() in {args.input.resolve(), args.output.resolve()}:
+        raise ValueError("layout report must differ from the input and SVG output paths")
     generator = _load_generator()
     data = _read_json(args.input)
-    svg, report = generator.build_svg_with_report(args.mode, data)
+    try:
+        svg, report = generator.build_svg_with_report(args.mode, data)
+    except RenderError as error:
+        if args.report:
+            args.report.parent.mkdir(parents=True, exist_ok=True)
+            args.report.write_text(
+                json.dumps({"ok": False, "error": str(error), "diagnostic": error.diagnostic},
+                           ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8",
+            )
+        raise
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(svg, encoding="utf-8")
     if args.report:
@@ -247,7 +259,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     try:
         return int(args.func(args))
     except (OSError, RuntimeError, ValueError, json.JSONDecodeError, ET.ParseError, subprocess.TimeoutExpired) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False), file=sys.stderr)
+        failure = {"ok": False, "error": str(error)}
+        if isinstance(error, RenderError):
+            failure["diagnostic"] = error.diagnostic
+        print(json.dumps(failure, ensure_ascii=False), file=sys.stderr)
         return 1
 
 
