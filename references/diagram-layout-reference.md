@@ -2,6 +2,24 @@
 
 Load only the relevant diagram type or shape section. User and selected style preferences take precedence over examples.
 
+## Routing failure diagnostics
+
+`fireworks.py render ... --report layout.json` writes a structured failure report
+for routing errors even when no SVG can be produced. Its stderr JSON contains
+the same `diagnostic`. The diagnostic identifies the edge, source and target IDs,
+resolved ports, endpoints, canvas bounds and routing padding. `ROUTE_NOT_FOUND`
+also counts rejected candidates and lists obstacles hit by candidates, with
+actual bounds and padded clearance bounds. These counts describe the search,
+not a proof that no valid route exists. The successful search does not collect
+these failure-only details.
+
+Obstacles retain their kind and owner: `node`, `container_header`, `edge_label`,
+`legend`, `footer` or `title_block`. Container headers also retain their rendered
+text, including prefixes. Inspect the reported bounds before changing corridors
+or moving nodes; keep header collision protection enabled. A waypoint inside an
+obstacle reports `WAYPOINT_OBSTACLE` and its index. Failure reports must use a
+path distinct from the input and SVG output.
+
 ## Diagram Types & Layout Rules
 
 ### Architecture Diagram

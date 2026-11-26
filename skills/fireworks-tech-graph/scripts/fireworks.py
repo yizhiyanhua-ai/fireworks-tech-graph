@@ -29,6 +29,7 @@ from validate_svg import run_check  # noqa: E402
 from png_export import export_png  # noqa: E402
 from image_import import IMAGE_SUFFIXES, image_output  # noqa: E402
 from semantic_contracts import STYLE_NAMES  # noqa: E402
+from render_diagnostics import RenderError  # noqa: E402
 
 
 def _load_generator():
@@ -151,7 +152,14 @@ def command_render(args: argparse.Namespace) -> int:
         data["text_policy"] = "strict"
     if any(node.get("native_shape") == "image" for node in data["nodes"]):
         raise ValueError("themed render does not lay out embedded raster layers; use convert to preserve them")
-    svg, report = _load_generator().build_svg_with_report(args.mode, data)
+    try:
+        svg, report = _load_generator().build_svg_with_report(args.mode, data)
+    except RenderError as error:
+        if args.report:
+            _write_text(args.report, json_text({
+                "ok": False, "error": str(error), "diagnostic": error.diagnostic,
+            }))
+        raise
     if args.output.suffix.lower() in {".drawio", ".xml", ".excalidraw"}:
         fmt = format_for(args.output)
         quality = []
@@ -387,7 +395,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     try:
         return int(args.func(args))
     except (OSError, RuntimeError, ValueError, json.JSONDecodeError, ET.ParseError, subprocess.TimeoutExpired) as error:
-        print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False), file=sys.stderr)
+        failure = {"ok": False, "error": str(error)}
+        if isinstance(error, RenderError):
+            failure["diagnostic"] = error.diagnostic
+        print(json.dumps(failure, ensure_ascii=False), file=sys.stderr)
         return 1
 
 
