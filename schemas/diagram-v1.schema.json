@@ -81,6 +81,7 @@
         "properties": {
           "id": { "type": "string", "minLength": 1 },
           "parent": { "type": "string", "minLength": 1 },
+          "source_refs": { "$ref": "#/$defs/sourceRefs" },
           "deployment_kind": { "type": "string", "minLength": 1 },
           "x": { "type": "number" },
           "y": { "type": "number" },
@@ -102,6 +103,7 @@
           "description": { "type": "string" },
           "technology": { "type": "string" },
           "deployment_id": { "type": "string", "minLength": 1 },
+          "source_refs": { "$ref": "#/$defs/sourceRefs" },
           "deployment_kind": { "type": "string", "minLength": 1 },
           "icon_id": { "type": "string", "minLength": 1 },
           "transit_role": { "enum": ["producer", "station", "junction", "consumer", "dlq", "state_store"] },
@@ -132,6 +134,11 @@
         "additionalProperties": true
       }
     },
+    "removal_refs": {
+      "type": "object",
+      "description": "Optional update-only evidence keyed by removed element ID.",
+      "additionalProperties": { "$ref": "#/$defs/sourceRefs" }
+    },
     "arrows": {
       "type": "array",
       "items": {
@@ -140,6 +147,7 @@
           "id": { "type": "string", "minLength": 1 },
           "source": { "type": "string" },
           "target": { "type": "string" },
+          "source_refs": { "$ref": "#/$defs/sourceRefs" },
           "edge_kind": { "enum": ["business", "telemetry"] },
           "transit_type": { "enum": ["rail", "publish", "branch", "consume", "retry", "state", "dead_letter"] },
           "topic_id": { "type": "string", "minLength": 1 },
@@ -161,6 +169,22 @@
     }
   },
   "$defs": {
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["commit", "path", "line"],
+        "properties": {
+          "commit": { "type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$" },
+          "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "line": { "type": "integer", "minimum": 1 },
+          "end_line": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
     "goldenSignal": {
       "type": "object",
       "required": ["value", "unit", "window", "status"],

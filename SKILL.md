@@ -2,7 +2,8 @@
 name: fireworks-tech-graph
 description: >-
   Create precise SVG technical diagrams, export PNG or offline HTML, and animate
-  supported semantic SVGs to GIF. Use for architecture, UML, agent, cloud or
+  supported semantic SVGs to GIF. Import and export Draw.io and Excalidraw,
+  embed screenshot references, and update diagrams from reviewed Git diffs. Use for architecture, UML, agent, cloud or
   workflow diagrams; not photos, raster art or statistical charts.
 ---
 
@@ -62,6 +63,29 @@ geometry and composition. Inspect the report's typography and palette scope;
 heuristic text widths do not replace inspecting the actual rendered font.
 Use [visual quality guidance](references/visual-quality.md) for readability and
 style-specific refinements. Keep one semantic connector per business edge.
+
+## Editable diagrams and architecture changes
+
+- For a native editable deliverable, produce or reuse Fireworks JSON, then run
+  `render architecture graph.json diagram.drawio` or use `.excalidraw`.
+  Use `convert` to keep the source layout and apply the target format's supported
+  label, style, and connector mapping. For Excalidraw, use `--require-quality`
+  when export must fail on a label-layout warning.
+- For an existing Draw.io or Excalidraw file, import it with `convert` or pass it
+  directly to `render`. Report import warnings. Select a Draw.io page explicitly
+  when a file has multiple pages.
+- For a screenshot, use `convert` for a pixel-preserving PNG, SVG, Draw.io or
+  Excalidraw reference. If editable shapes are requested, draft a Fireworks JSON
+  graph from visible evidence. Flag ambiguous labels and connectors, compare the
+  draft against the screenshot, then validate, render and review the editable output.
+- For a PR update, start from the maintained Fireworks JSON. Inspect the pinned
+  base/head Git diff and only propose supported changes. Reuse stable IDs; attach
+  exact source references to changed shapes and connectors. Use `update` with a
+  review report and highlight any evidence still needing review. The command
+  verifies reference locations; it cannot infer that a source line proves a
+  particular architectural relationship.
+
+See [interop and PR updates](docs/INTERCHANGE.md) for commands and scope.
 
 ## Additional outputs
 

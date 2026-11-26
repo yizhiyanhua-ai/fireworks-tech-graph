@@ -31,6 +31,7 @@ if SCRIPT_DIR not in sys.path:
 
 import fireworks_geometry as geometry  # noqa: E402
 import composition_quality as quality  # noqa: E402
+from diagram_formats import edge_markers  # noqa: E402
 from diagram_ir import normalize_diagram  # noqa: E402
 from semantic_contracts import STYLE_NAMES, resolve_style_index  # noqa: E402
 from svg_canvas import parse_viewbox  # noqa: E402
@@ -611,6 +612,8 @@ _RESERVED_DOM_IDS = frozenset(
 )
 _EDGE_DOM_SUFFIXES = (
     "-bridge-mask",
+    "-start-marker",
+    "-end-marker",
     "-critical-glow",
     "-direction",
     "-hop",
@@ -2756,6 +2759,20 @@ def prepare_arrows(arrows: Sequence[Dict[str, object]], node_map: Dict[str, Node
     return prepared
 
 
+def render_endpoint_marker(identifier: str, kind: str, color: str) -> str:
+    paint = normalize_attribute(color)
+    shapes = {
+        "arrow": f'<path d="M 2 2 L 10 6 L 2 10" fill="none" stroke="{paint}" stroke-width="1.5"/>',
+        "triangle": f'<path d="M 2 2 L 10 6 L 2 10 Z" fill="{paint}"/>',
+        "circle": f'<circle cx="6" cy="6" r="4" fill="{paint}"/>',
+        "diamond": f'<path d="M 2 6 L 6 2 L 10 6 L 6 10 Z" fill="{paint}"/>',
+        "bar": f'<path d="M 8 2 L 8 10" fill="none" stroke="{paint}" stroke-width="1.5"/>',
+    }
+    return (f'<defs><marker id="{normalize_attribute(identifier)}" viewBox="0 0 12 12" '
+            f'markerWidth="7" markerHeight="7" refX="10" refY="6" orient="auto-start-reverse">'
+            f'{shapes[kind]}</marker></defs>')
+
+
 def render_arrow(
     arrow: Dict[str, object],
     style: Dict[str, object],
@@ -2807,14 +2824,17 @@ def render_arrow(
         routing_data["source_port"] = source_port
     if target_port:
         routing_data["target_port"] = target_port
-    route = build_orthogonal_route(
-        start,
-        end,
-        obstacles,
-        routing_data,
-        canvas_bounds=canvas_bounds,
-        existing_routes=existing_routes,
-    )
+    try:
+        route = build_orthogonal_route(
+            start,
+            end,
+            obstacles,
+            routing_data,
+            canvas_bounds=canvas_bounds,
+            existing_routes=existing_routes,
+        )
+    except ValueError as error:
+        raise ValueError(f"edge {edge_id}: {error}") from error
     interactions = geometry.route_interactions(route, existing_routes)
     if interactions.overlap_count:
         raise ValueError(f"edge {edge_id} has an unresolved collinear overlap")
@@ -2892,8 +2912,19 @@ def render_arrow(
     path = (
         f'  <path id="{normalize_attribute(edge_dom_id)}" data-graph-role="edge" {shared_attributes} '
         f'data-bridges="{bridge_attr}" d="{path_d}" fill="none" stroke="{color}" '
-        f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round" marker-end="{marker}"'
+        f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round"'
     )
+    start_marker, end_marker = edge_markers(arrow)
+    if start_marker is not None:
+        identifier = f"{edge_dom_id}-start-marker"
+        rendered_paths.append(render_endpoint_marker(identifier, start_marker, color))
+        path += f' marker-start="url(#{identifier})"'
+    if end_marker is not None:
+        if end_marker != "arrow":
+            identifier = f"{edge_dom_id}-end-marker"
+            rendered_paths.append(render_endpoint_marker(identifier, end_marker, color))
+            marker = f"url(#{identifier})"
+        path += f' marker-end="{marker}"'
     if dash:
         path += f' stroke-dasharray="{dash}"'
     if arrow.get("opacity") is not None:

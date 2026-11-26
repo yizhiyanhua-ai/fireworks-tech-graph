@@ -44,13 +44,6 @@ User: "Generate a Mem0 memory architecture diagram, dark style"
 
 ## Sponsors
 
-<table>
-  <tr>
-    <td width="200" align="center"><a href="https://aigocode.app/invite/yizhiyanhua"><img src="assets/sponsors/aigocode.png" alt="AIGoCode" width="160" /></a></td>
-    <td>Thanks to <strong>AIGoCode</strong> for sponsoring this project! AIGoCode is an all-in-one platform that integrates Claude Code, Codex, and the latest Gemini models, providing you with stable, efficient, and highly cost-effective AI coding services. The sponsor advertises flexible subscriptions and direct access without a VPN; availability and account conditions follow its own service terms. AIGoCode has prepared a special benefit for <strong>fireworks-tech-graph</strong> users: if you register via <a href="https://aigocode.app/invite/yizhiyanhua">this link</a>, you'll receive an extra <strong>10% bonus credit</strong> on your first top-up!</td>
-  </tr>
-</table>
-
 Interested in becoming a sponsor? Contact: <a href="mailto:ccc7574@gmail.com">ccc7574@gmail.com</a>
 
 ---
@@ -214,6 +207,39 @@ visual_review: passed
 If the runtime cannot read images, the skill reports `visual_review: skipped (image reader unavailable)` explicitly. The workflow remains bounded and auditable; it does not claim visual verification without image evidence.
 
 ---
+
+## What's new in this update
+
+| Feature | What it supports |
+| --- | --- |
+| **Editable diagram interchange** | Import and export Draw.io and Excalidraw, and convert through Fireworks JSON. Draw.io imports support compressed pages and page selection. Conversion preserves supported labels, colors, connection endpoints, arrowheads at either end, and explicit bends. |
+| **Clearer native exports** | Resolve Draw.io object labels such as C4 fields. Keep multiline and external labels readable, and use orthogonal routing approximations when the source omits bends. Excalidraw export checks label fit and placement. Source stencil simplifications appear in the import report. |
+| **Image input** | Open PNG, JPEG, and WebP as pixel-checked references and export PNG, SVG, Draw.io, or Excalidraw. Both editors preserve embedded raster layers across conversions (Pillow required). To edit individual nodes and connections, use the image to draft and review a Fireworks JSON graph. |
+| **Quality gates** | `convert --strict-import` rejects reported import losses, `convert --require-quality` rejects Excalidraw label-layout warnings, and `render --strict-text` rejects truncated or suppressed text. Use `check` to validate SVG geometry, collisions, and composition. |
+| **Git-backed updates** | `update` preserves stable IDs and layout where possible and emits a review report with commit-pinned source locations. |
+
+See [format limits and end-to-end commands](docs/INTERCHANGE.md).
+
+### Four style-switch comparisons
+
+Each pair uses the same diagram input and changes only its style. The shared inputs use style-neutral footers and leave theme-specific surfaces to the renderer. All eight variants passed the SVG checks and strict text gate. Their node IDs, connector endpoints, and semantic profiles match within each pair, and the images were reviewed after Chromium rendering.
+
+| Diagram | Style pair | Comparison |
+| --- | --- | --- |
+| Checkout platform · C4 architecture | 9 C4 Review Canvas ↔ 3 Blueprint | [View PNG](assets/samples/style-comparisons/architecture.png) |
+| Checkout event line · event flow | 11 Event Transit ↔ 2 Dark Terminal | [View PNG](assets/samples/style-comparisons/events.png) |
+| Multi-agent collaboration · agent workflow | 5 Glassmorphism ↔ 6 Claude Official | [View PNG](assets/samples/style-comparisons/agent.png) |
+| Mem0 · memory architecture | 1 Flat Icon ↔ 4 Notion Clean | [View PNG](assets/samples/style-comparisons/memory.png) |
+
+To reproduce the C4 switch, keep the source `semantic_profile` and change `style` in a copy. If the source also sets `visual_theme`, update the two selectors together or remove the alias. Review explicit fills, text colors, and style-specific captions when moving between dark and light palettes.
+
+```bash
+python3 -c 'import json; from pathlib import Path; d = json.loads(Path("fixtures/c4-review-canvas-style9.json").read_text()); d["style"] = 3; d["footer"] = d["footer"].split(" · ", 2)[-1]; Path("checkout-blueprint.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")'
+python3 scripts/fireworks.py render architecture checkout-blueprint.json checkout-blueprint.svg --strict-text
+python3 scripts/fireworks.py check checkout-blueprint.svg
+```
+
+Styles 1–7 and 9–12 are generated from JSON. Style 8 (Dark Luxury) uses an AI-authored SVG workflow, and specialized renderings may require fields for their semantic contract.
 
 ## Installation
 

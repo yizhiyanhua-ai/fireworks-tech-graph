@@ -42,13 +42,6 @@ python3 "$SKILL_ROOT/scripts/fireworks.py" export-png diagram.svg diagram.png --
 
 ## 赞助商
 
-<table>
-  <tr>
-    <td width="200" align="center"><a href="https://aigocode.app/invite/yizhiyanhua"><img src="assets/sponsors/aigocode.png" alt="AIGoCode" width="160" /></a></td>
-    <td>感谢 <strong>AIGoCode</strong> 对本项目的赞助！AIGoCode 是一个集成了 Claude Code、Codex 与最新 Gemini 模型的一站式平台，为你提供稳定、高效且极具性价比的 AI 编程服务。据赞助方介绍，平台提供灵活订阅与无需 VPN 的直连服务；可用性与账户规则以其自身服务条款为准。AIGoCode 为 <strong>fireworks-tech-graph</strong> 用户准备了专属福利：通过<a href="https://aigocode.app/invite/yizhiyanhua">此链接</a>注册，首次充值即可额外获得 <strong>10% 奖励额度</strong>！</td>
-  </tr>
-</table>
-
 有兴趣成为赞助商？请联系：<a href="mailto:ccc7574@gmail.com">ccc7574@gmail.com</a>
 
 ---
@@ -199,6 +192,39 @@ visual_review: passed
 当运行环境无法读取图片时，Skill 会明确报告 `visual_review: skipped (image reader unavailable)`。整个流程保持可观察、可审计，也不会在缺少图片证据时宣称已经完成视觉验证。
 
 ---
+
+## 本次更新
+
+| 功能 | 支持范围 |
+| --- | --- |
+| **可编辑图互转** | 导入和导出 Draw.io、Excalidraw，可通过 Fireworks JSON 中转。Draw.io 支持压缩页和指定页码。转换保留支持的标签、颜色、连接端口、两端箭头和显式折点。 |
+| **原生导出更清晰** | 展开 C4 等 Draw.io 对象的模板字段，保留换行和外置标签。原文件缺少折点时可近似重建正交路线。Excalidraw 导出检查标签能否放下以及是否遮挡其他内容，专用模具降级会写入导入报告。 |
+| **图片输入** | PNG、JPEG、WebP 可作为逐像素核验的参考图，输出为 PNG、SVG、Draw.io 或 Excalidraw。嵌入图片层可在两个编辑器间往返转换（需 Pillow）。要单独编辑节点和连线，可根据原图起草并核对 Fireworks JSON 后重绘。 |
+| **质量检查** | `convert --strict-import` 拒绝有导入损失告警的输出，`convert --require-quality` 拒绝有 Excalidraw 标签布局告警的输出，`render --strict-text` 拒绝有截断或隐藏文字的输出。`check` 继续检查 SVG 几何、碰撞和构图。 |
+| **基于 Git 的图更新** | `update` 尽量保留稳定 ID 和原布局，生成带固定提交和源码位置的评审报告。 |
+
+详见[格式边界与完整命令](docs/INTERCHANGE.md)。
+
+### 四组风格切换对照
+
+每组使用同一份结构稿，只切换风格。共用稿采用中性的页脚，主题底色和材质交给渲染器。八个版本全部通过 SVG 检查和严格文字校验。每组的节点 ID、连线端点和语义配置一致，并在 Chromium 实渲染后检查了成图。
+
+| 图类型 | 风格对照 | 图片 |
+| --- | --- | --- |
+| 结账平台 · C4 架构图 | 9 C4 评审画布 ↔ 3 工程蓝图 | [查看 PNG](assets/samples/style-comparisons/architecture.png) |
+| 结账事件线 · 事件流 | 11 Event Transit ↔ 2 暗黑极客 | [查看 PNG](assets/samples/style-comparisons/events.png) |
+| 多 Agent 协作 · 工作流 | 5 玻璃态卡片 ↔ 6 Claude 风格 | [查看 PNG](assets/samples/style-comparisons/agent.png) |
+| Mem0 · 记忆架构 | 1 扁平图标 ↔ 4 Notion 极简 | [查看 PNG](assets/samples/style-comparisons/memory.png) |
+
+以 C4 切换为例，复制结构稿，保留 `semantic_profile`，修改 `style`。如果源文件同时设置了 `visual_theme`，同步修改这两个字段，或移除别名字段。切换深浅主题时，检查手动指定的底色、文字色和带旧风格名的说明。
+
+```bash
+python3 -c 'import json; from pathlib import Path; d = json.loads(Path("fixtures/c4-review-canvas-style9.json").read_text()); d["style"] = 3; d["footer"] = d["footer"].split(" · ", 2)[-1]; Path("checkout-blueprint.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")'
+python3 scripts/fireworks.py render architecture checkout-blueprint.json checkout-blueprint.svg --strict-text
+python3 scripts/fireworks.py check checkout-blueprint.svg
+```
+
+风格 1–7 和 9–12 支持从 JSON 生成。风格 8（暗黑奢华）沿用 AI 绘制 SVG 的流程。专业风格可能要求额外的语义字段。
 
 ## 安装
 
