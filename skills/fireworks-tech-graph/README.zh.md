@@ -240,6 +240,26 @@ npx -y skills@1.5.17 add \
 
 命令会把完整 Skill 分别复制到 Codex 的 `~/.agents/skills/fireworks-tech-graph` 与 Claude Code 的 `~/.claude/skills/fireworks-tech-graph`，其中包含脚本、schema、fixture、模板、测试、参考资料与元数据。
 
+### Qoder IDE、Qoder CLI 与 QoderWork
+
+Qoder IDE 和 Qoder CLI 可安装完整 Skill：
+
+```bash
+npx -y skills@1.5.17 add \
+  yizhiyanhua-ai/fireworks-tech-graph/skills/fireworks-tech-graph \
+  --agent qoder -g -y --copy
+```
+
+用户级目录是 `~/.qoder/skills/fireworks-tech-graph`。安装后重启 Qoder IDE，或在已有 Qoder CLI 会话中运行 `/skills reload`。
+
+**QoderWork** 使用独立目录。克隆或下载本仓库，将完整的 `skills/fireworks-tech-graph` 目录复制到
+`~/.qoderwork/skills/`，让脚本、夹具和模板与 `SKILL.md` 一起安装。运行
+`python3 ~/.qoderwork/skills/fireworks-tech-graph/scripts/fireworks.py version` 核对安装结果，再在新会话中请求生成一张小型 SVG。
+
+官方文档：[Qoder IDE Skills](https://docs.qoder.com/extensions/skills)、
+[Qoder CLI Skills](https://docs.qoder.com/cli/Skills)、
+[QoderWork Skills](https://docs.qoder.com/qoderwork/skills)。
+
 ### Codex 的可编辑 Git 安装
 
 ```bash

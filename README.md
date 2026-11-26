@@ -255,6 +255,29 @@ npx -y skills@1.5.17 add \
 
 This creates complete copies at `~/.agents/skills/fireworks-tech-graph` for Codex and `~/.claude/skills/fireworks-tech-graph` for Claude Code, including scripts, schemas, fixtures, templates, tests, references, and metadata.
 
+### Qoder IDE, Qoder CLI, and QoderWork
+
+Install the complete bundle for Qoder IDE or Qoder CLI:
+
+```bash
+npx -y skills@1.5.17 add \
+  yizhiyanhua-ai/fireworks-tech-graph/skills/fireworks-tech-graph \
+  --agent qoder -g -y --copy
+```
+
+Qoder discovers the user-level bundle under `~/.qoder/skills/fireworks-tech-graph`.
+Restart Qoder IDE or use `/skills reload` in an existing Qoder CLI session.
+
+For **QoderWork**, clone or download this repository and copy the complete
+`skills/fireworks-tech-graph` directory into `~/.qoderwork/skills/`. Keep the scripts,
+fixtures, and templates alongside `SKILL.md`. Verify the installed bundle with
+`python3 ~/.qoderwork/skills/fireworks-tech-graph/scripts/fireworks.py version`,
+then request a small SVG in a new conversation.
+
+Sources: [Qoder IDE Skills](https://docs.qoder.com/extensions/skills),
+[Qoder CLI Skills](https://docs.qoder.com/cli/Skills), and
+[QoderWork Skills](https://docs.qoder.com/qoderwork/skills).
+
 ### Editable Git checkout for Codex
 
 ```bash
